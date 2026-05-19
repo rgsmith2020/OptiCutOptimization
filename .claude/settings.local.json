@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c ' *)",
+      "Bash(pip install *)",
+      "Bash(python -c \"import main; print\\('OK'\\)\")",
+      "Bash(C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\.venv\\\\Scripts\\\\python.exe *)",
+      "PowerShell(& \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\.venv\\\\Scripts\\\\python.exe\" -c \"import PIL; print\\(PIL.__version__\\)\")",
+      "PowerShell(& \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\.venv\\\\Scripts\\\\python.exe\" \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\_gen_icon.py\")",
+      "PowerShell(& \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\.venv\\\\Scripts\\\\pip.exe\" install pyinstaller --quiet)",
+      "PowerShell(Get-Item \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\dist\\\\OptiCut.exe\" | Select-Object Name, @{N='Size MB';E={[math]::Round\\($_.Length/1MB,1\\)}}, LastWriteTime)"
+    ]
+  }
+}
