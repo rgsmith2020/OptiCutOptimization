@@ -10,6 +10,7 @@
 #
 # ================================================================================
 
+import csv
 import json
 import sys
 import tkinter as tk
@@ -50,6 +51,11 @@ PALETTE = [
     ('#2980b9', '#1a5276'),
 ]
 
+_CSV_MODELS = {
+    'A': 'Model A', 'B': 'Model B', 'C': 'Model C', 'D': 'Model D',
+    'E': 'Model E', 'F': 'Model F', 'Z': 'Model Z', 'CUSTOM': 'Custom',
+}
+
 CANVAS_W = 340
 CANVAS_H = 500
 MARGIN   = 24
@@ -67,13 +73,27 @@ C_WHITE     = '#ffffff'
 
 # ── pack engine ───────────────────────────────────────────────────────────────
 
+def _choose_orientation(dw, dh, sw, sl, kerf):
+    """Return (w, h, rotated) for the orientation that packs the most items/sheet."""
+    def capacity(w, h):
+        if w > sw or h > sl:
+            return 0
+        a = int((sw + kerf) / (w + kerf)) if kerf > 0 else int(sw / w)
+        d = int((sl + kerf) / (h + kerf)) if kerf > 0 else int(sl / h)
+        return a * d
+    if capacity(dh, dw) > capacity(dw, dh):
+        return dh, dw, True
+    return dw, dh, False
+
+
 def _pack(pieces, sw, sl, kerf):
     items = []
     for p in pieces:
+        w, h, rot = _choose_orientation(p['door_w'], p['door_h'], sw, sl, kerf)
         for _ in range(int(p['qty'])):
-            items.append({'w': p['door_w'], 'h': p['door_h'],
+            items.append({'w': w, 'h': h,
                           'fill': p['fill'], 'outline': p['outline'],
-                          'name': p['name']})
+                          'name': p['name'], 'rotated': rot})
     items.sort(key=lambda x: (x['h'], x['w']), reverse=True)
 
     sheets = []
@@ -111,12 +131,14 @@ def calculate_multi(pieces, sw, sl, kerf):
     for p in pieces:
         if p['door_w'] <= 0 or p['door_h'] <= 0:
             raise ValueError(f'"{p["name"]}" has invalid dimensions.')
-        if p['door_w'] > sw:
-            raise ValueError(f'"{p["name"]}" W ({p["door_w"]:.3f}") exceeds stock width ({sw}").')
-        if p['door_h'] > sl:
-            raise ValueError(f'"{p["name"]}" H ({p["door_h"]:.3f}") exceeds stock length ({sl}").')
         if p['qty'] <= 0:
             raise ValueError(f'"{p["name"]}" quantity must be > 0.')
+        fits_orig = p['door_w'] <= sw and p['door_h'] <= sl
+        fits_rot  = p['door_h'] <= sw and p['door_w'] <= sl
+        if not fits_orig and not fits_rot:
+            raise ValueError(
+                f'"{p["name"]}" ({p["door_w"]:.3f}" × {p["door_h"]:.3f}") '
+                f'cannot fit on the stock sheet ({sw}" × {sl}") in any orientation.')
 
     sheets     = _pack(pieces, sw, sl, kerf)
     n_sheets   = len(sheets)
@@ -179,6 +201,12 @@ class OptiCutApp(tk.Tk):
         file_menu.add_separator()
         file_menu.add_command(label='Exit', accelerator='Alt+F4', command=self.destroy)
         self._file_menu = file_menu
+
+        import_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label='Import', menu=import_menu)
+        import_menu.add_command(label='Import from CSV...', command=self._import_csv)
+        import_menu.add_command(label='Download Template', command=self._download_template)
+
         self.bind_all('<Control-o>', lambda _: self._open())
         self.bind_all('<Control-s>', lambda _: self._save())
 
@@ -262,7 +290,7 @@ class OptiCutApp(tk.Tk):
         win.resizable(False, False)
         win.grab_set()
         ttk.Label(win, text='OptiCut', font=('Segoe UI', 16, 'bold')).pack(pady=(20, 4))
-        ttk.Label(win, text='Version 2.0').pack()
+        ttk.Label(win, text='Version 2.5.2').pack()
         ttk.Label(win, text='Locker door nesting calculator.').pack(pady=(8, 0))
         ttk.Label(win, text='Optimized for Hollman Inc. Lockers').pack(pady=(8, 0))
         ttk.Label(win, text='© 2026 - Northern Lights Studios').pack(pady=(4, 8))
@@ -276,6 +304,132 @@ class OptiCutApp(tk.Tk):
         lbl.image = img
         lbl.pack(pady=(0, 12))
         ttk.Button(win, text='OK', command=win.destroy).pack(pady=(0, 16))
+
+    # ── CSV import ────────────────────────────────────────────────────────────
+
+    def _import_csv(self):
+        path = filedialog.askopenfilename(
+            filetypes=[('CSV files', '*.csv'), ('All files', '*.*')],
+            title='Import from CSV',
+        )
+        if not path:
+            return
+
+        errors   = []
+        imported = []
+        try:
+            with open(path, newline='', encoding='utf-8-sig') as f:
+                lines = [ln for ln in f if not ln.lstrip().startswith('#')]
+            reader = csv.DictReader(lines)
+            if not reader.fieldnames:
+                messagebox.showerror('Import Error', 'CSV file is empty.')
+                return
+            norm_headers = {k.strip().lower() for k in reader.fieldnames if k}
+            required = {'label', 'model', 'width', 'height', 'qty'}
+            missing  = required - norm_headers
+            if missing:
+                messagebox.showerror('Import Error',
+                    f'Missing column(s): {", ".join(sorted(missing))}\n\n'
+                    'Use Import → Download Template for the correct format.')
+                return
+            for row_num, row in enumerate(reader, start=2):
+                r = {k.strip().lower(): (v or '').strip()
+                     for k, v in row.items() if k}
+                model_code = r.get('model', '').upper()
+                if model_code not in _CSV_MODELS:
+                    errors.append(
+                        f'Row {row_num}: invalid Model "{r.get("model","")}"'
+                        f' — accepted values: A B C D E F Z CUSTOM')
+                    continue
+                try:
+                    width  = float(r['width'])
+                    height = float(r['height'])
+                    qty    = int(float(r['qty']))
+                except ValueError:
+                    errors.append(
+                        f'Row {row_num}: Width, Height, Qty must be numeric.')
+                    continue
+                if width <= 0 or height <= 0:
+                    errors.append(
+                        f'Row {row_num}: Width and Height must be > 0.')
+                    continue
+                if qty <= 0:
+                    errors.append(f'Row {row_num}: Qty must be > 0.')
+                    continue
+                label     = r.get('label', '').strip()
+                model_key = _CSV_MODELS[model_code]
+                if model_key == 'Custom':
+                    door_w, door_h = width, height
+                    auto_name = f'Custom {door_w:.2f}×{door_h:.2f}'
+                else:
+                    frac      = MODELS[model_key]['fractional_openings']
+                    door_w    = width
+                    door_h    = height * frac
+                    auto_name = f'{model_key} {width:.2f}×{height:.2f}'
+                imported.append({
+                    'name':   label if label else auto_name,
+                    'door_w': door_w,
+                    'door_h': door_h,
+                    'qty':    qty,
+                })
+        except Exception as e:
+            messagebox.showerror('Import Error', f'Could not read file:\n{e}')
+            return
+
+        if errors:
+            err_msg = '\n'.join(errors)
+            if imported:
+                if not messagebox.askyesno('Import Warnings',
+                        f'{len(errors)} row(s) skipped due to errors:\n\n'
+                        f'{err_msg}\n\nImport {len(imported)} valid row(s)?'):
+                    return
+            else:
+                messagebox.showerror('Import Error',
+                    f'No valid rows found:\n\n{err_msg}')
+                return
+
+        if not imported:
+            messagebox.showinfo('Import', 'No pieces found in the CSV file.')
+            return
+
+        for p in imported:
+            idx = len(self._pieces)
+            p['fill'], p['outline'] = PALETTE[idx % len(PALETTE)]
+            self._pieces.append(p)
+
+        self._refresh_pieces_table()
+        messagebox.showinfo('Import Complete',
+            f'{len(imported)} piece type(s) imported successfully.')
+
+    def _download_template(self):
+        path = filedialog.asksaveasfilename(
+            defaultextension='.csv',
+            filetypes=[('CSV files', '*.csv'), ('All files', '*.*')],
+            initialfile='OptiCut_template.csv',
+            title='Save CSV Template',
+        )
+        if not path:
+            return
+        data_rows = [
+            ['Label',        'Model', 'Width', 'Height', 'Qty'],
+            ['Main Doors',   'A',     '9',     '96',     '100'],
+            ['Half Doors',   'Z',     '9',     '96',     '50'],
+            ['Custom Panel', 'CUSTOM','12',    '48',     '20'],
+        ]
+        notes = [
+            '# ─────────────────────────────────────────────────────────────────',
+            '# Model codes : A  B  C  D  E  F  Z  →  Width/Height = Locker dims',
+            '#               CUSTOM               →  Width/Height = Door cut dims',
+            '# Label is optional — leave blank to auto-generate name',
+        ]
+        try:
+            with open(path, 'w', newline='', encoding='utf-8-sig') as f:
+                csv.writer(f).writerows(data_rows)
+                for note in notes:
+                    f.write(note + '\n')
+            messagebox.showinfo('Template Saved', f'Template saved to:\n{path}')
+        except Exception as e:
+            messagebox.showerror('Save Error', str(e))
 
     # ── UI construction ───────────────────────────────────────────────────────
 
@@ -371,8 +525,12 @@ class OptiCutApp(tk.Tk):
         self.ap_qty_var = tk.IntVar(value=100)
         ttk.Entry(ap, textvariable=self.ap_qty_var, width=13).grid(row=5, column=1, **pad)
 
+        ttk.Label(ap, text='Label').grid(row=6, column=0, sticky='w', **pad)
+        self.ap_label_var = tk.StringVar(value='')
+        ttk.Entry(ap, textvariable=self.ap_label_var, width=13).grid(row=6, column=1, **pad)
+
         ttk.Button(ap, text='Add Piece', command=self._add_piece).grid(
-            row=6, column=0, columnspan=2, pady=(4, 6))
+            row=7, column=0, columnspan=2, pady=(4, 6))
 
         # PIECES TO CUT
         tk.Frame(left, height=4).grid(row=2)
@@ -575,21 +733,24 @@ class OptiCutApp(tk.Tk):
             if qty <= 0:
                 raise ValueError('Qty must be > 0')
             if model == 'Custom':
-                dw   = float(self.ap_cdw_var.get())
-                dh   = float(self.ap_cdh_var.get())
-                name = f'Custom {dw:.2f}×{dh:.2f}'
+                dw       = float(self.ap_cdw_var.get())
+                dh       = float(self.ap_cdh_var.get())
+                auto_name = f'Custom {dw:.2f}×{dh:.2f}'
             else:
-                lw   = self.ap_lw_var.get()
-                lh   = self.ap_lh_var.get()
-                frac = MODELS[model]['fractional_openings']
-                dw   = lw
-                dh   = lh * frac
-                name = f'{model} {lw:.2f}×{lh:.2f}'
+                lw       = self.ap_lw_var.get()
+                lh       = self.ap_lh_var.get()
+                frac     = MODELS[model]['fractional_openings']
+                dw       = lw
+                dh       = lh * frac
+                auto_name = f'{model} {lw:.2f}×{lh:.2f}'
             if dw <= 0 or dh <= 0:
                 raise ValueError('Door dimensions must be > 0')
         except ValueError as e:
             messagebox.showerror('Input Error', str(e))
             return
+
+        label = self.ap_label_var.get().strip()
+        name  = label if label else auto_name
 
         idx = len(self._pieces)
         fill, outline = PALETTE[idx % len(PALETTE)]
@@ -597,6 +758,7 @@ class OptiCutApp(tk.Tk):
             'name': name, 'door_w': dw, 'door_h': dh,
             'qty': qty, 'fill': fill, 'outline': outline,
         })
+        self.ap_label_var.set('')
         self._refresh_pieces_table()
 
     def _remove_piece(self):
@@ -774,6 +936,10 @@ class OptiCutApp(tk.Tk):
                     (x0 + x1) / 2, (y0 + y1) / 2,
                     text=it['name'], fill='white',
                     font=('Segoe UI', 7), width=max(1, int(pw - 4)))
+            if it.get('rotated') and pw > 16 and ph > 10:
+                self.canvas.create_text(x1 - 4, y0 + 5, text='↺',
+                                        fill='white', font=('Segoe UI', 7, 'bold'),
+                                        anchor='e')
 
         # Right-edge scrap strip (based on max packed x)
         if items:

@@ -12,7 +12,17 @@
       "Bash(powershell -Command \"Get-Item 'NestingCalc.xlsm' | Select-Object FullName, Length, LastWriteTime\")",
       "Bash(python3)",
       "PowerShell(& \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\.venv\\\\Scripts\\\\python.exe\" -c \"import ast; ast.parse\\(open\\(r'C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\main.py'\\).read\\(\\)\\); print\\('OK'\\)\")",
-      "Bash(python -c \"import ast, sys; ast.parse\\(open\\('main.py'\\).read\\(\\)\\); print\\('Syntax OK'\\)\")"
+      "Bash(python -c \"import ast, sys; ast.parse\\(open\\('main.py'\\).read\\(\\)\\); print\\('Syntax OK'\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('main.py'\\).read\\(\\)\\); print\\('OK'\\)\")",
+      "Bash(pyinstaller --onefile --windowed --add-data \"saw-blade.ico;.\" --add-data \"NorthernLights SM.png;.\" --name \"OptiCut_v2.5\" main.py)",
+      "Bash(dir \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\dist\\\\OptiCut_v2.5.exe\")",
+      "Bash(findstr /i \"opticut\")",
+      "Bash(dir C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\dist *)",
+      "Bash(pyinstaller --onefile --windowed --icon \"saw-blade.ico\" --add-data \"saw-blade.ico;.\" --add-data \"NorthernLights SM.png;.\" --name \"OptiCut_v2.5\" main.py)",
+      "Bash(Remove-Item -Recurse -Force build, dist\\\\OptiCut_v2.5.exe, OptiCut_v2.5.spec -ErrorAction SilentlyContinue)",
+      "Bash(Write-Host \"Cleaned\")",
+      "PowerShell(ie4uinit.exe -show; Write-Host \"Icon cache refreshed\")",
+      "PowerShell(ie4uinit.exe -show)"
     ]
   }
 }
