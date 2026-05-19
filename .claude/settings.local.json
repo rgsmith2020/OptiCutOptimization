@@ -8,7 +8,11 @@
       "PowerShell(& \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\.venv\\\\Scripts\\\\python.exe\" -c \"import PIL; print\\(PIL.__version__\\)\")",
       "PowerShell(& \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\.venv\\\\Scripts\\\\python.exe\" \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\_gen_icon.py\")",
       "PowerShell(& \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\.venv\\\\Scripts\\\\pip.exe\" install pyinstaller --quiet)",
-      "PowerShell(Get-Item \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\dist\\\\OptiCut.exe\" | Select-Object Name, @{N='Size MB';E={[math]::Round\\($_.Length/1MB,1\\)}}, LastWriteTime)"
+      "PowerShell(Get-Item \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\dist\\\\OptiCut.exe\" | Select-Object Name, @{N='Size MB';E={[math]::Round\\($_.Length/1MB,1\\)}}, LastWriteTime)",
+      "Bash(powershell -Command \"Get-Item 'NestingCalc.xlsm' | Select-Object FullName, Length, LastWriteTime\")",
+      "Bash(python3)",
+      "PowerShell(& \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\.venv\\\\Scripts\\\\python.exe\" -c \"import ast; ast.parse\\(open\\(r'C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\\\\main.py'\\).read\\(\\)\\); print\\('OK'\\)\")",
+      "Bash(python -c \"import ast, sys; ast.parse\\(open\\('main.py'\\).read\\(\\)\\); print\\('Syntax OK'\\)\")"
     ]
   }
 }
