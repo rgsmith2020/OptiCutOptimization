@@ -22,7 +22,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='OptiCut_v2.5',
+    name='OptiCut_v3.0',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
