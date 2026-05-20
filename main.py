@@ -613,11 +613,15 @@ class OptiCutApp(tk.Tk):
         ttk.Button(left, text='     Calculate     ',
                    command=self.on_calculate).grid(row=7, column=0, pady=6)
 
-        # RESULTS SUMMARY
-        self._section_header(left, 'RESULTS SUMMARY', C_MED_BLUE, row=8)
+        # ── Middle panel ──────────────────────────────────────────────────────
+        mid = ttk.Frame(self)
+        mid.grid(row=0, column=1, sticky='nsew', padx=(4, 4), pady=8)
 
-        res = tk.Frame(left, bg=C_LITE_BLUE)
-        res.grid(row=9, column=0, sticky='ew')
+        # RESULTS SUMMARY
+        self._section_header(mid, 'RESULTS SUMMARY', C_MED_BLUE, row=0)
+
+        res = tk.Frame(mid, bg=C_LITE_BLUE)
+        res.grid(row=1, column=0, sticky='ew')
         res.grid_columnconfigure(0, weight=1)
 
         result_rows = [
@@ -647,11 +651,11 @@ class OptiCutApp(tk.Tk):
                 self._color_lbls[tag] = lbl
 
         # PER-SHEET BREAKDOWN
-        tk.Frame(left, height=4).grid(row=10)
-        self._section_header(left, 'PER-SHEET BREAKDOWN', C_MED_BLUE, row=11)
+        tk.Frame(mid, height=4).grid(row=2)
+        self._section_header(mid, 'PER-SHEET BREAKDOWN', C_MED_BLUE, row=3)
 
-        tree_frame = tk.Frame(left)
-        tree_frame.grid(row=12, column=0, sticky='ew')
+        tree_frame = tk.Frame(mid)
+        tree_frame.grid(row=4, column=0, sticky='ew')
 
         cols = ('sheet', 'pieces', 'used_sqf', 'utilization', 'status')
         self.tree = ttk.Treeview(tree_frame, columns=cols, show='headings',
@@ -671,7 +675,7 @@ class OptiCutApp(tk.Tk):
 
         # ── Right panel ───────────────────────────────────────────────────────
         right = ttk.Frame(self)
-        right.grid(row=0, column=1, sticky='nsew', padx=(4, 8), pady=8)
+        right.grid(row=0, column=2, sticky='nsew', padx=(4, 8), pady=8)
 
         self._section_header(right, 'NESTING LAYOUT', C_DARK_BLUE, row=0)
 

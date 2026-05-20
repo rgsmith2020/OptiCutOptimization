@@ -28,7 +28,13 @@
       "Bash(Sort-Object)",
       "PowerShell(Get-ChildItem \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\" -Exclude \".venv\" | Where-Object { $_.Extension -in @\\(\".md\", \".txt\", \".rst\"\\) -or $_.BaseName -in @\\(\"README\", \"CHANGELOG\", \"LICENSE\"\\) } | Select-Object Name)",
       "PowerShell(Get-ChildItem \"C:\\\\Users\\\\Rsmit\\\\OneDrive\\\\Desktop\\\\_Python_\\\\OptiCut\" -Exclude \".venv\" | Where-Object { $_.Name -match \"requirements|setup|pyproject\" } | Select-Object Name)",
-      "Bash(python -c \"import ast; ast.parse\\(open\\('main.py'\\).read\\(\\)\\); print\\('Syntax OK'\\)\")"
+      "Bash(python -c \"import ast; ast.parse\\(open\\('main.py'\\).read\\(\\)\\); print\\('Syntax OK'\\)\")",
+      "Bash(Rename-Item *)",
+      "PowerShell(Rename-Item *)",
+      "Bash(git add *)",
+      "Bash(git rm *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }
