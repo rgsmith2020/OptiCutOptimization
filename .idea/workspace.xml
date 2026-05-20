@@ -4,36 +4,17 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bd02b6e4-accc-4036-ba89-b5512731caf3" name="Changes" comment="2.5.1">
+    <list default="true" id="bd02b6e4-accc-4036-ba89-b5512731caf3" name="Changes" comment="2.5.2">
       <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OptiCut_v2.5.spec" beforeDir="false" afterPath="$PROJECT_DIR$/OptiCut_v2.5.spec" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut/Analysis-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut/EXE-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut/OptiCut.pkg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut/PKG-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut/PYZ-00.pyz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut/PYZ-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut/base_library.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut/warn-OptiCut.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut/xref-OptiCut.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.0/Analysis-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.0/EXE-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.0/OptiCut_v2.0.pkg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.0/PKG-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.0/PYZ-00.pyz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.0/PYZ-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.0/base_library.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.0/warn-OptiCut_v2.0.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.0/xref-OptiCut_v2.0.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.5/Analysis-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/OptiCut_v2.5/Analysis-00.toc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.5/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/OptiCut_v2.5/EXE-00.toc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.5/OptiCut_v2.5.pkg" beforeDir="false" afterPath="$PROJECT_DIR$/build/OptiCut_v2.5/OptiCut_v2.5.pkg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.5/PKG-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/OptiCut_v2.5/PKG-00.toc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.5/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/build/OptiCut_v2.5/base_library.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.5/warn-OptiCut_v2.5.txt" beforeDir="false" afterPath="$PROJECT_DIR$/build/OptiCut_v2.5/warn-OptiCut_v2.5.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/OptiCut_v2.5/xref-OptiCut_v2.5.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/OptiCut_v2.5/xref-OptiCut_v2.5.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/OptiCut_v2.5.exe" beforeDir="false" afterPath="$PROJECT_DIR$/dist/OptiCut_v2.5.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/saw-blade.ico" beforeDir="false" afterPath="$PROJECT_DIR$/saw-blade.ico" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -42,23 +23,23 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="9" />
+    <option name="cachedIndexableFilesCount" value="28" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "rgsmith2020"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;rgsmith2020&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/rgsmith2020/OptiCutOptimization",
-    "accountId": "b3f3cd87-6570-4560-b859-053720cce7a2"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/rgsmith2020/OptiCutOptimization&quot;,
+    &quot;accountId&quot;: &quot;b3f3cd87-6570-4560-b859-053720cce7a2&quot;
   }
-}]]></component>
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -118,6 +99,8 @@
       <updated>1779196246579</updated>
       <workItem from="1779196247600" duration="1939000" />
       <workItem from="1779201053937" duration="13507000" />
+      <workItem from="1779223590976" duration="1451000" />
+      <workItem from="1779287288964" duration="1260000" />
     </task>
     <task id="LOCAL-00001" summary="1.0.1">
       <option name="closed" value="true" />
@@ -151,7 +134,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779220571223</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="2.5.2">
+      <option name="closed" value="true" />
+      <created>1779223729883</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1779223729884</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -172,20 +163,21 @@
     <MESSAGE value="1.0.1" />
     <MESSAGE value="2.0.1" />
     <MESSAGE value="2.5.1" />
-    <option name="LAST_COMMIT_MESSAGE" value="2.5.1" />
+    <MESSAGE value="2.5.2" />
+    <option name="LAST_COMMIT_MESSAGE" value="2.5.2" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main.py</url>
-          <line>997</line>
+          <line>1067</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/OptiCut$main.coverage" NAME="main Coverage Results" MODIFIED="1779220173557" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/OptiCut$main.coverage" NAME="main Coverage Results" MODIFIED="1779287760274" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

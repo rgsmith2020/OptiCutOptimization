@@ -73,8 +73,17 @@ C_WHITE     = '#ffffff'
 
 # ── pack engine ───────────────────────────────────────────────────────────────
 
-def _choose_orientation(dw, dh, sw, sl, kerf):
-    """Return (w, h, rotated) for the orientation that packs the most items/sheet."""
+def _choose_orientation(dw, dh, sw, sl, kerf, grain_match=False, grain_direction='vertical'):
+    """Return (w, h, rotated) for the orientation that packs the most items/sheet.
+
+    When grain_match is True the orientation is forced to preserve grain alignment:
+      vertical   – grain runs along piece height (door_h stays on Y-axis, rotated=False)
+      horizontal – grain runs along piece width  (piece rotated 90°, rotated=True)
+    """
+    if grain_match:
+        if grain_direction == 'horizontal':
+            return dh, dw, True
+        return dw, dh, False
     def capacity(w, h):
         if w > sw or h > sl:
             return 0
@@ -86,10 +95,11 @@ def _choose_orientation(dw, dh, sw, sl, kerf):
     return dw, dh, False
 
 
-def _pack(pieces, sw, sl, kerf):
+def _pack(pieces, sw, sl, kerf, grain_match=False, grain_direction='vertical'):
     items = []
     for p in pieces:
-        w, h, rot = _choose_orientation(p['door_w'], p['door_h'], sw, sl, kerf)
+        w, h, rot = _choose_orientation(p['door_w'], p['door_h'], sw, sl, kerf,
+                                        grain_match, grain_direction)
         for _ in range(int(p['qty'])):
             items.append({'w': w, 'h': h,
                           'fill': p['fill'], 'outline': p['outline'],
@@ -125,7 +135,7 @@ def _pack(pieces, sw, sl, kerf):
     return sheets
 
 
-def calculate_multi(pieces, sw, sl, kerf):
+def calculate_multi(pieces, sw, sl, kerf, grain_match=False, grain_direction='vertical'):
     if not pieces:
         raise ValueError('Add at least one piece type before calculating.')
     for p in pieces:
@@ -133,14 +143,26 @@ def calculate_multi(pieces, sw, sl, kerf):
             raise ValueError(f'"{p["name"]}" has invalid dimensions.')
         if p['qty'] <= 0:
             raise ValueError(f'"{p["name"]}" quantity must be > 0.')
-        fits_orig = p['door_w'] <= sw and p['door_h'] <= sl
-        fits_rot  = p['door_h'] <= sw and p['door_w'] <= sl
-        if not fits_orig and not fits_rot:
-            raise ValueError(
-                f'"{p["name"]}" ({p["door_w"]:.3f}" × {p["door_h"]:.3f}") '
-                f'cannot fit on the stock sheet ({sw}" × {sl}") in any orientation.')
+        if grain_match:
+            if grain_direction == 'horizontal':
+                fits = p['door_h'] <= sw and p['door_w'] <= sl
+            else:
+                fits = p['door_w'] <= sw and p['door_h'] <= sl
+            if not fits:
+                orient = grain_direction.capitalize()
+                raise ValueError(
+                    f'"{p["name"]}" ({p["door_w"]:.3f}" × {p["door_h"]:.3f}") '
+                    f'cannot fit on the stock sheet ({sw}" × {sl}") with '
+                    f'{orient} grain matching. Disable grain matching or use a larger stock sheet.')
+        else:
+            fits_orig = p['door_w'] <= sw and p['door_h'] <= sl
+            fits_rot  = p['door_h'] <= sw and p['door_w'] <= sl
+            if not fits_orig and not fits_rot:
+                raise ValueError(
+                    f'"{p["name"]}" ({p["door_w"]:.3f}" × {p["door_h"]:.3f}") '
+                    f'cannot fit on the stock sheet ({sw}" × {sl}") in any orientation.')
 
-    sheets     = _pack(pieces, sw, sl, kerf)
+    sheets     = _pack(pieces, sw, sl, kerf, grain_match, grain_direction)
     n_sheets   = len(sheets)
     area_stock = sw * sl
     sqf_stock  = area_stock / 144
@@ -158,17 +180,19 @@ def calculate_multi(pieces, sw, sl, kerf):
     scrap_sqf    = max(0.0, (n_sheets * area_stock - total_area) / 144)
 
     return {
-        'sheets':       sheets,
-        'total_sheets': n_sheets,
-        'total_qty':    total_qty,
-        'total_sqf':    total_sqf,
-        'sqf_stock':    sqf_stock,
-        'utilization':  util_overall,
-        'waste_pct':    waste_pct,
-        'scrap_sqf':    scrap_sqf,
-        'stock_width':  sw,
-        'stock_length': sl,
-        'kerf':         kerf,
+        'sheets':          sheets,
+        'total_sheets':    n_sheets,
+        'total_qty':       total_qty,
+        'total_sqf':       total_sqf,
+        'sqf_stock':       sqf_stock,
+        'utilization':     util_overall,
+        'waste_pct':       waste_pct,
+        'scrap_sqf':       scrap_sqf,
+        'stock_width':     sw,
+        'stock_length':    sl,
+        'kerf':            kerf,
+        'grain_match':     grain_match,
+        'grain_direction': grain_direction,
     }
 
 
@@ -219,10 +243,12 @@ class OptiCutApp(tk.Tk):
         if not path:
             return
         data = {
-            'stock_size':   self.stock_size_var.get(),
-            'stock_width':  self.stock_w_var.get(),
-            'stock_length': self.stock_l_var.get(),
-            'kerf':         self.kerf_var.get(),
+            'stock_size':      self.stock_size_var.get(),
+            'stock_width':     self.stock_w_var.get(),
+            'stock_length':    self.stock_l_var.get(),
+            'kerf':            self.kerf_var.get(),
+            'grain_match':     self.grain_match_var.get(),
+            'grain_direction': self.grain_dir_var.get(),
             'pieces': [
                 {'name': p['name'], 'door_w': p['door_w'],
                  'door_h': p['door_h'], 'qty': p['qty']}
@@ -268,6 +294,8 @@ class OptiCutApp(tk.Tk):
             self.stock_w_var.set(float(data['stock_width']))
             self.stock_l_var.set(float(data['stock_length']))
             self.kerf_var.set(float(data.get('kerf', KERF_DEF)))
+            self.grain_match_var.set(bool(data.get('grain_match', False)))
+            self.grain_dir_var.set(data.get('grain_direction', 'vertical'))
             self._pieces = []
             for i, p in enumerate(data['pieces']):
                 fill, outline = PALETTE[i % len(PALETTE)]
@@ -290,7 +318,7 @@ class OptiCutApp(tk.Tk):
         win.resizable(False, False)
         win.grab_set()
         ttk.Label(win, text='OptiCut', font=('Segoe UI', 16, 'bold')).pack(pady=(20, 4))
-        ttk.Label(win, text='Version 2.5.2').pack()
+        ttk.Label(win, text='Version 3.0.0').pack()
         ttk.Label(win, text='Locker door nesting calculator.').pack(pady=(8, 0))
         ttk.Label(win, text='Optimized for Hollman Inc. Lockers').pack(pady=(8, 0))
         ttk.Label(win, text='© 2026 - Northern Lights Studios').pack(pady=(4, 8))
@@ -473,6 +501,22 @@ class OptiCutApp(tk.Tk):
         ttk.Label(stk, text='Kerf / Blade (in)').grid(row=4, column=0, sticky='w', **pad)
         self.kerf_var = tk.DoubleVar(value=KERF_DEF)
         ttk.Entry(stk, textvariable=self.kerf_var, width=13).grid(row=4, column=1, **pad)
+
+        ttk.Separator(stk, orient='horizontal').grid(
+            row=5, column=0, columnspan=2, sticky='ew', padx=6, pady=2)
+
+        self.grain_match_var = tk.BooleanVar(value=False)
+        ttk.Checkbutton(stk, text='Grain Match', variable=self.grain_match_var).grid(
+            row=6, column=0, columnspan=2, sticky='w', padx=8, pady=(2, 0))
+
+        self._grain_dir_frame = ttk.Frame(stk)
+        self._grain_dir_frame.grid(row=7, column=0, columnspan=2, sticky='w', padx=16, pady=(0, 4))
+        self.grain_dir_var = tk.StringVar(value='vertical')
+        ttk.Radiobutton(self._grain_dir_frame, text='Vertical',
+                        variable=self.grain_dir_var, value='vertical').pack(side='left', padx=(0, 6))
+        ttk.Radiobutton(self._grain_dir_frame, text='Horizontal',
+                        variable=self.grain_dir_var, value='horizontal').pack(side='left')
+        self._grain_dir_frame.grid_remove()
 
         # Add Piece
         ap = ttk.LabelFrame(cfg, text='Add Piece')
@@ -659,6 +703,7 @@ class OptiCutApp(tk.Tk):
         self.stock_size_var.trace_add('write', lambda *_: self._on_stock_size_change())
         self.ap_lw_var.trace_add('write', lambda *_: self._update_door_preview())
         self.ap_lh_var.trace_add('write', lambda *_: self._update_door_preview())
+        self.grain_match_var.trace_add('write', lambda *_: self._on_grain_match_change())
         self._on_stock_size_change()
         self._update_door_preview()
 
@@ -681,6 +726,12 @@ class OptiCutApp(tk.Tk):
             self.stock_l_var.set(dims[1])
             self.stock_w_entry.config(state='disabled')
             self.stock_l_entry.config(state='disabled')
+
+    def _on_grain_match_change(self):
+        if self.grain_match_var.get():
+            self._grain_dir_frame.grid()
+        else:
+            self._grain_dir_frame.grid_remove()
 
     def _on_ap_model_change(self):
         is_custom = self.ap_model_var.get() == 'Custom'
@@ -824,6 +875,8 @@ class OptiCutApp(tk.Tk):
                 self.stock_w_var.get(),
                 self.stock_l_var.get(),
                 self.kerf_var.get(),
+                self.grain_match_var.get(),
+                self.grain_dir_var.get(),
             )
         except Exception as e:
             messagebox.showerror('Calculation Error', str(e))
@@ -919,6 +972,23 @@ class OptiCutApp(tk.Tk):
         # Sheet outline
         self.canvas.create_rectangle(ox, oy, ox + spx, oy + spy,
                                      fill='#ffffff', outline='#333333', width=2)
+
+        # Grain direction indicator
+        if r.get('grain_match'):
+            grain_color = '#c8b48a'
+            grain_step  = 9
+            if r.get('grain_direction') == 'horizontal':
+                y = oy + grain_step
+                while y < oy + spy:
+                    self.canvas.create_line(ox + 1, y, ox + spx - 1, y,
+                                            fill=grain_color, width=1)
+                    y += grain_step
+            else:
+                x = ox + grain_step
+                while x < ox + spx:
+                    self.canvas.create_line(x, oy + 1, x, oy + spy - 1,
+                                            fill=grain_color, width=1)
+                    x += grain_step
 
         items = r['sheets'][idx]
 
